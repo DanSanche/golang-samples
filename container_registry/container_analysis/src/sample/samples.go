@@ -7,16 +7,6 @@ import (
 	containeranalysispb "google.golang.org/genproto/googleapis/devtools/containeranalysis/v1alpha1"
 )
 
-func deleteOccurrence(occurrenceName string) (error){
-	ctx := context.Background()
-	c, err := containeranalysis.NewClient(ctx)
-	if err != nil {
-		return err
-	}
-	req := &containeranalysispb.DeleteOccurrenceRequest{Name: occurrenceName}
-	return c.DeleteOccurrence(ctx, req)
-}
-
 
 func createNote(noteId, projectId string) (*containeranalysispb.Note, error) {
 	ctx := context.Background()
@@ -30,6 +20,39 @@ func createNote(noteId, projectId string) (*containeranalysispb.Note, error) {
 	note := containeranalysispb.Note{NoteType:&noteType}
 	req := &containeranalysispb.CreateNoteRequest{Parent:parent, NoteId:noteId, Note:&note}
 	return c.CreateNote(ctx, req)
+}
+
+func createOccurrence(imageUrl, parentNoteId, projectId string) (*containeranalysispb.Occurrence, error){
+	return nil, nil
+}
+func updateNote(updated *containeranalysispb.Note, noteId, projectId string) (error){
+	return nil
+}
+
+func updateOccurrence(updated *containeranalysispb.Occurrence, occurrenceName string) (error){
+	return nil
+}
+
+func deleteNote(noteId, projectId string) (error){
+	return nil
+}
+
+func deleteOccurrence(occurrenceName string) (error){
+	ctx := context.Background()
+	c, err := containeranalysis.NewClient(ctx)
+	if err != nil {
+		return err
+	}
+	req := &containeranalysispb.DeleteOccurrenceRequest{Name: occurrenceName}
+	return c.DeleteOccurrence(ctx, req)
+}
+
+func getNote(noteId, projectId string) (*containeranalysispb.Note, error){
+	return nil, nil
+}
+
+func getOccurrence(occurrenceName string) (*containeranalysispb.Occurrence, error){
+	return nil, nil
 }
 
 

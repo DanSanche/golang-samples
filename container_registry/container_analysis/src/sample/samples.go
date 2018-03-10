@@ -55,6 +55,25 @@ func getOccurrence(occurrenceName string) (*containeranalysispb.Occurrence, erro
 	return nil, nil
 }
 
+func getDiscoveryInfo(imageUrl, projectId string) (error){
+	return nil
+}
+
+func getOccurrencesForNote(noteId, projectId string) (int, error){
+	return 0, nil
+}
+
+func getOccurrencesForImage(imageUrl, projectId string) (int, error){
+	return 0, nil
+}
+
+func pubsub(subscriptionId string, timeout int, projectId string) (int, error){
+	return 0, nil
+}
+
+func createOccurrenceSubscription(subscriptionId, projectId string) (error){
+	return nil
+}
 
 func main() {
 	fmt.Println("hello world")

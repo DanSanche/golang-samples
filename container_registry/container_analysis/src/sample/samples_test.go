@@ -18,6 +18,7 @@ type TestVariables struct {
 	noteObj *containeranalysispb.Note
 }
 
+//Run before each test. Creates a set of useful variables
 func setup(t *testing.T) (TestVariables){
 	//get test name
 	value := reflect.ValueOf(*t)
@@ -36,6 +37,8 @@ func setup(t *testing.T) (TestVariables){
 	return v
 }
 
+//Run after each test
+//Removes any unneeded resources allocated for test
 func teardown(t *testing.T, v TestVariables) {
 	t.Log("TEARDOWN " + v.testName)
 	err := sample.DeleteNote(v.noteId, v.projectId)
@@ -45,7 +48,55 @@ func teardown(t *testing.T, v TestVariables) {
 }
 
 
-func TestTesting(t *testing.T){
+func TestCreateNote(t *testing.T){
+	v := setup(t)
+	t.Errorf("failed")
+	teardown(t, v)
+}
+
+func TestDeleteNote(t *testing.T){
+	v := setup(t)
+	t.Errorf("failed")
+	teardown(t, v)
+}
+
+func TestUpdateNote(t *testing.T){
+	v := setup(t)
+	t.Errorf("failed")
+	teardown(t, v)
+}
+
+func TestCreateOccurrence(t *testing.T){
+	v := setup(t)
+	t.Errorf("failed")
+	teardown(t, v)
+}
+
+func TestDeleteOccurrence(t *testing.T){
+	v := setup(t)
+	t.Errorf("failed")
+	teardown(t, v)
+}
+
+func TestUpdateOccurrence(t *testing.T){
+	v := setup(t)
+	t.Errorf("failed")
+	teardown(t, v)
+}
+
+func TestOccurrencesForImage(t *testing.T){
+	v := setup(t)
+	t.Errorf("failed")
+	teardown(t, v)
+}
+
+func TestOccurrencesForNote(t *testing.T){
+	v := setup(t)
+	t.Errorf("failed")
+	teardown(t, v)
+}
+
+func TestPubSub(t *testing.T){
 	v := setup(t)
 	t.Errorf("failed")
 	teardown(t, v)

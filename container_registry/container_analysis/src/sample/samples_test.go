@@ -47,16 +47,41 @@ func teardown(t *testing.T, v TestVariables) {
 	}
 }
 
+//test equality between two values
+func assertEqual(t *testing.T, a interface{}, b interface{}) {
+	if a != b {
+		t.Errorf("%s != %s", a, b)					
+	}
+}
+
 
 func TestCreateNote(t *testing.T){
 	v := setup(t)
-	t.Errorf("failed")
+
+	newNote, err := sample.GetNote(v.noteId, v.projectId)
+	if err != nil{
+		t.Fatal(err)
+	} else if newNote != nil {
+		assertEqual(t, newNote.Name, v.noteObj.Name)
+	} else {
+		t.Error("both outputs == nil")
+	}
+
 	teardown(t, v)
 }
 
 func TestDeleteNote(t *testing.T){
 	v := setup(t)
-	t.Errorf("failed")
+	
+	err := sample.DeleteNote(v.noteId, v.projectId)
+	if err != nil{
+		t.Error(err)
+	}
+	deleted, err := sample.GetNote(v.noteId, v.projectId)
+	if deleted != nil || err == nil {
+		t.Error("GetNote succeeded after DeleteNote")
+	}
+	
 	teardown(t, v)
 }
 

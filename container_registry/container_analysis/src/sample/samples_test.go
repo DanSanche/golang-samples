@@ -87,25 +87,90 @@ func TestDeleteNote(t *testing.T){
 
 func TestUpdateNote(t *testing.T){
 	v := setup(t)
-	t.Errorf("failed")
+
+	description := "updated"
+	v.noteObj.ShortDescription = description
+	err := sample.UpdateNote(v.noteObj, v.noteId, v.projectId)
+	if err != nil {
+		t.Error(err)
+	}
+	updated, err := sample.GetNote(v.noteId, v.projectId)
+	if err != nil{
+		t.Fatal(err)
+	} else if updated != nil {
+		assertEqual(t, updated.ShortDescription, description)
+	} else {
+		t.Error("Could not find updated note. No error returned")
+	}
+
 	teardown(t, v)
 }
 
 func TestCreateOccurrence(t *testing.T){
 	v := setup(t)
-	t.Errorf("failed")
+	
+	created, err := sample.CreateOccurrence(v.imageUrl, v.noteId, v.projectId)
+	if err != nil {
+		t.Error(err)
+	} else if err == nil && created == nil {
+		t.Error("Both CreateOccurrence outputs == nil")
+	} else {
+		retrieved, err := sample.GetOccurrence(created.Name)
+		if err != nil{
+			t.Error(err)
+		} else if retrieved != nil {
+			assertEqual(t, retrieved.Name, created.Name)
+		} else {
+			t.Error("Could not find updated note. No error returned")
+		}
+	}
+
 	teardown(t, v)
 }
 
 func TestDeleteOccurrence(t *testing.T){
 	v := setup(t)
-	t.Errorf("failed")
+
+	created, err := sample.CreateOccurrence(v.imageUrl, v.noteId, v.projectId)
+	if err != nil {
+		t.Error(err)
+	} else if err == nil && created == nil {
+		t.Error("Both CreateOccurrence outputs == nil")
+	} else {
+		err = sample.DeleteOccurrence(created.Name)	
+		if err != nil {
+			t.Error(err)
+		}
+		deleted, err := sample.GetOccurrence(created.Name)
+		if deleted != nil || err == nil {
+			t.Error("GetOccurrence succeeded after DeleteOccurrence")
+		}
+	}
+
 	teardown(t, v)
 }
 
 func TestUpdateOccurrence(t *testing.T){
 	v := setup(t)
-	t.Errorf("failed")
+	
+
+	created, err := sample.CreateOccurrence(v.imageUrl, v.noteId, v.projectId)
+	if err != nil {
+		t.Error(err)
+	} else if err == nil && created == nil {
+		t.Error("Both CreateOccurrence outputs == nil")
+	} else {
+		newType := "updated"
+		//vulType := containeranalysispb.VulnerabilityType{}
+		//vulDetails := vulType.VulnerabilityDetails()
+		//vulDetails.Type = newType
+		vulDetails := created.GetVulnerabilityDetails()
+		vulDetails.Type = newType
+		t.Error("finish implementing later")
+	}
+
+
+	
 	teardown(t, v)
 }
 

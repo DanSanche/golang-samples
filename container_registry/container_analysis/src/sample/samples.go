@@ -59,7 +59,14 @@ func UpdateNote(updated *containeranalysispb.Note, noteId, projectId string) (er
 // [START update_occurrence]
 //Makes an update to an existing occurrence
 func UpdateOccurrence(updated *containeranalysispb.Occurrence, occurrenceName string) (error){
-	return nil
+	ctx := context.Background()
+	c, err := containeranalysis.NewClient(ctx)
+	if err != nil {
+		return err
+	}
+	req := &containeranalysispb.UpdateOccurrenceRequest{Name: occurrenceName, Occurrence:updated}
+	_, err = c.UpdateOccurrence(ctx, req)
+	return err
 }
 // [END update_occurrence]
 

@@ -161,12 +161,20 @@ func TestUpdateOccurrence(t *testing.T){
 		t.Error("Both CreateOccurrence outputs == nil")
 	} else {
 		newType := "updated"
-		//vulType := containeranalysispb.VulnerabilityType{}
-		//vulDetails := vulType.VulnerabilityDetails()
-		//vulDetails.Type = newType
-		vulDetails := created.GetVulnerabilityDetails()
-		vulDetails.Type = newType
-		t.Error("finish implementing later")
+		vul := new(containeranalysispb.VulnerabilityType_VulnerabilityDetails)
+		vul.Type = newType
+		vulDetails := containeranalysispb.Occurrence_VulnerabilityDetails{VulnerabilityDetails:vul}
+		occurrence := containeranalysispb.Occurrence{NoteName: created.NoteName, ResourceUrl: created.ResourceUrl, Details:&vulDetails}
+		sample.UpdateOccurrence(&occurrence, created.Name)
+		retrieved, err := sample.GetOccurrence(created.Name)
+		if err != nil{
+			t.Error(err)
+		} else if retrieved != nil {
+			retrievedDetails := retrieved.GetVulnerabilityDetails()
+			assertEqual(t, retrievedDetails.Type, newType)
+		} else {
+			t.Error("Could not find updated occurrence. No error returned")
+		}
 	}
 
 

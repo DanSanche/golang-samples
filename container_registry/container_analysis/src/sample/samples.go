@@ -27,7 +27,17 @@ func CreateNote(noteId, projectId string) (*containeranalysispb.Note, error) {
 // [START create_occurrence]
 //Creates and returns a new occurrence
 func CreateOccurrence(imageUrl, parentNoteId, projectId string) (*containeranalysispb.Occurrence, error){
-	return nil, nil
+	ctx := context.Background()
+	c, err := containeranalysis.NewClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	parent := containeranalysis.NotePath(projectId, parentNoteId)
+	project := containeranalysis.ProjectPath(projectId)
+	vulDetails := containeranalysispb.Occurrence_VulnerabilityDetails{new(containeranalysispb.VulnerabilityType_VulnerabilityDetails)}
+	occurrence := containeranalysispb.Occurrence{NoteName: parent, ResourceUrl: imageUrl, Details:&vulDetails}
+	req := &containeranalysispb.CreateOccurrenceRequest{Parent:project, Occurrence:&occurrence}
+	return c.CreateOccurrence(ctx, req)
 }
 // [END create_occurrence]
 
@@ -98,7 +108,13 @@ func GetNote(noteId, projectId string) (*containeranalysispb.Note, error){
 // [START get_occurrence]
 //Retrieves an occurrence based on its name
 func GetOccurrence(occurrenceName string) (*containeranalysispb.Occurrence, error){
-	return nil, nil
+	ctx := context.Background()
+	c, err := containeranalysis.NewClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	req := &containeranalysispb.GetOccurrenceRequest{occurrenceName}
+	return c.GetOccurrence(ctx, req)
 }
 // [END get_occurrence]
 

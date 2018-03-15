@@ -49,7 +49,14 @@ func UpdateOccurrence(updated *containeranalysispb.Occurrence, occurrenceName st
 // [START delete_note]
 //Deletes an existing note from the project
 func DeleteNote(noteId, projectId string) (error){
-	return nil
+	ctx := context.Background()
+	c, err := containeranalysis.NewClient(ctx)
+	if err != nil {
+		return err
+	}
+	noteName := containeranalysis.NotePath(projectId, noteId)
+	req := &containeranalysispb.DeleteNoteRequest{Name: noteName}
+	return c.DeleteNote(ctx, req)
 }
 // [END delete_note]
 

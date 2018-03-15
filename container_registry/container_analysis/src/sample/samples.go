@@ -69,7 +69,14 @@ func DeleteOccurrence(occurrenceName string) (error){
 // [START get_note]
 //Retrieves a note based on its noteId and projectId
 func GetNote(noteId, projectId string) (*containeranalysispb.Note, error){
-	return nil, nil
+	ctx := context.Background()
+	c, err := containeranalysis.NewClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	noteName := containeranalysis.NotePath(projectId, noteId)
+	req := &containeranalysispb.GetNoteRequest{noteName}
+	return c.GetNote(ctx, req)
 }
 // [END get_note]
 

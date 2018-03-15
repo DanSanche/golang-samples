@@ -34,7 +34,15 @@ func CreateOccurrence(imageUrl, parentNoteId, projectId string) (*containeranaly
 // [START update_note]
 //Makes an update to an existing note
 func UpdateNote(updated *containeranalysispb.Note, noteId, projectId string) (error){
-	return nil
+	ctx := context.Background()
+	c, err := containeranalysis.NewClient(ctx)
+	if err != nil {
+		return err
+	}
+	noteName := containeranalysis.NotePath(projectId, noteId)
+	req := &containeranalysispb.UpdateNoteRequest{Name: noteName, Note:updated}
+	_, err = c.UpdateNote(ctx, req)
+	return err
 }
 // [END update_note]
 

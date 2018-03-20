@@ -136,14 +136,49 @@ func GetDiscoveryInfo(imageUrl, projectId string) (error){
 // [START occurrences_for_note]
 //Retrieves all the occurrences associated with a specified note
 func GetOccurrencesForNote(noteId, projectId string) (int, error){
-	return 0, nil
+	ctx := context.Background()
+	c, err := containeranalysis.NewClient(ctx)
+	if err != nil {
+		return -1, err
+	}
+	noteName := containeranalysis.NotePath(projectId, noteId)
+	req := &containeranalysispb.ListNoteOccurrencesRequest{Name:noteName}
+	iterator := c.ListNoteOccurrences(ctx, req)
+	var complete error
+	count := -1
+	for complete == nil {
+		// we can do something with the retrieved occurence here
+		// for this sample, we will just count them
+		_, complete = iterator.Next()
+		count = count + 1
+	}
+
+	return count, nil
 }
 // [END occurrences_for_note]
 
 // [START occurrences_for_image]
 //Retrieves all the occurrences associated with a specified image
 func GetOccurrencesForImage(imageUrl, projectId string) (int, error){
-	return 0, nil
+	filterStr := "resourceUrl=\"" + imageUrl + "\""
+	ctx := context.Background()
+	c, err := containeranalysis.NewClient(ctx)
+	if err != nil {
+		return -1, err
+	}
+	project := containeranalysis.ProjectPath(projectId)
+	req := &containeranalysispb.ListOccurrencesRequest{Parent:project, Filter:filterStr}
+	iterator := c.ListOccurrences(ctx, req)
+	var complete error
+	count := -1
+	for complete == nil {
+		// we can do something with the retrieved occurence here
+		// for this sample, we will just count them
+		_, complete = iterator.Next()
+		count = count + 1
+	}
+
+	return count, nil
 }
 // [END occurrences_for_image]
 

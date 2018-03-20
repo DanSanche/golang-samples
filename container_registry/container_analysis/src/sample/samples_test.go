@@ -16,6 +16,8 @@ type TestVariables struct {
 	imageUrl string
 	projectId string
 	noteObj *containeranalysispb.Note
+	tryLimit int
+	sleepTime int
 }
 
 //Run before each test. Creates a set of useful variables
@@ -26,6 +28,9 @@ func setup(t *testing.T) (TestVariables){
 	t.Log("SETUP " + name)
 	//get current timestamp
 	timestamp:= strconv.Itoa(int(time.Now().Unix()))
+	//set how many times to retry network tasks
+	tryLimit := 20
+	sleepTime := 1
 
 	//create variables used by tests
 	projectId := os.Getenv("GOOGLE_CLOUD_PROJECT")
@@ -33,7 +38,8 @@ func setup(t *testing.T) (TestVariables){
 	imageUrl := "www." + timestamp + name + ".com"
 	noteObj, _ := sample.CreateNote(noteId, projectId)
 
-	v := TestVariables{name, noteId, imageUrl, projectId, noteObj}
+
+	v := TestVariables{name, noteId, imageUrl, projectId, noteObj, tryLimit, sleepTime}
 	return v
 }
 
@@ -176,21 +182,52 @@ func TestUpdateOccurrence(t *testing.T){
 			t.Error("Could not find updated occurrence. No error returned")
 		}
 	}
-
-
-	
 	teardown(t, v)
 }
 
 func TestOccurrencesForImage(t *testing.T){
 	v := setup(t)
-	t.Errorf("failed")
+	newCount := 0
+	tries := 0
+	
+	origCount, err := sample.GetOccurrencesForImage(v.imageUrl, v.projectId)
+	if err != nil {
+		t.Fatal(err)
+	}
+	created, _ := sample.CreateOccurrence(v.imageUrl, v.noteId, v.projectId)
+	for newCount != 1 && tries < v.tryLimit{
+		newCount, _ = sample.GetOccurrencesForImage(v.imageUrl, v.projectId)
+		tries = tries + 1
+		time.Sleep(time.Second*time.Duration(v.sleepTime))
+	}
+	assertEqual(t, origCount, 0)
+	assertEqual(t, newCount, 1)
+
+	// clean up
+	sample.DeleteOccurrence(created.Name)
 	teardown(t, v)
 }
 
 func TestOccurrencesForNote(t *testing.T){
 	v := setup(t)
-	t.Errorf("failed")
+	newCount := 0
+	tries := 0
+	
+	origCount, err := sample.GetOccurrencesForNote(v.noteId, v.projectId)
+	if err != nil {
+		t.Fatal(err)
+	}
+	created, _ := sample.CreateOccurrence(v.imageUrl, v.noteId, v.projectId)
+	for newCount != 1 && tries < v.tryLimit{
+		newCount, _ = sample.GetOccurrencesForNote(v.noteId, v.projectId)
+		tries = tries + 1
+		time.Sleep(time.Second*time.Duration(v.sleepTime))
+	}
+	assertEqual(t, origCount, 0)
+	assertEqual(t, newCount, 1)
+
+	// clean up
+	sample.DeleteOccurrence(created.Name)
 	teardown(t, v)
 }
 

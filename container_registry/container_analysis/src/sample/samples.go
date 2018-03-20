@@ -129,6 +129,21 @@ func GetOccurrence(occurrenceName string) (*containeranalysispb.Occurrence, erro
 //Prints the Discovery occurrence created for a specified image
 //This occurrence contains information about the initial scan on the image
 func GetDiscoveryInfo(imageUrl, projectId string) (error){
+	filterStr := "kind=\"DISCOVERY\" AND resourceUrl=\"" + imageUrl + "\""
+	ctx := context.Background()
+	c, err := containeranalysis.NewClient(ctx)
+	if err != nil {
+		return err
+	}
+	project := containeranalysis.ProjectPath(projectId)
+	req := &containeranalysispb.ListOccurrencesRequest{Parent:project, Filter:filterStr}
+	iterator := c.ListOccurrences(ctx, req)
+	var complete error
+	var occ *containeranalysispb.Occurrence
+	for complete == nil {
+		occ, complete = iterator.Next()
+		fmt.Println(occ)
+	}
 	return nil
 }
 // [END discovery_info]

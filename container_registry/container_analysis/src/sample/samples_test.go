@@ -6,8 +6,10 @@ import (
 	"reflect"
 	"time"
 	"strconv"
+	"golang.org/x/net/context"
 	sample "sample"
 	containeranalysispb "google.golang.org/genproto/googleapis/devtools/containeranalysis/v1alpha1"
+	pubsub "cloud.google.com/go/pubsub"
 )
 
 type TestVariables struct {
@@ -233,6 +235,17 @@ func TestOccurrencesForNote(t *testing.T){
 
 func TestPubSub(t *testing.T){
 	v := setup(t)
-	t.Errorf("failed")
+	
+	// create subscription if it doesn't exist
+	ctx := context.Background()
+	subId := "drydockOccurrences"
+	sample.CreateOccurrenceSubscription(subId, v.projectId)
+	client, _ := pubsub.NewClient(ctx, v.projectId)
+	sub := client.Subscription(subId)
+	
+
+	// clean up
+	sub.Delete(ctx)
+
 	teardown(t, v)
 }

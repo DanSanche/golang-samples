@@ -6,10 +6,8 @@ import (
 	"reflect"
 	"time"
 	"strconv"
-	"golang.org/x/net/context"
 	sample "sample"
 	containeranalysispb "google.golang.org/genproto/googleapis/devtools/containeranalysis/v1alpha1"
-	pubsub "cloud.google.com/go/pubsub"
 )
 
 type TestVariables struct {
@@ -237,15 +235,33 @@ func TestPubSub(t *testing.T){
 	v := setup(t)
 	
 	// create subscription if it doesn't exist
-	ctx := context.Background()
-	subId := "drydockOccurrences"
+	subId := "drydock-occurrences-go"
 	sample.CreateOccurrenceSubscription(subId, v.projectId)
-	client, _ := pubsub.NewClient(ctx, v.projectId)
-	sub := client.Subscription(subId)
-	
 
-	// clean up
-	sub.Delete(ctx)
+	
+	// run pubsub so any messages left in queue are acked
+	sample.Pubsub(subId, 5, v.projectId)
+
+	// use channel and goroutine to count incomming messages
+	c := make(chan int)
+	go pubsubRoutine() {
+		count, err := sample.Pubsub(subId, 20, v.projectId)
+		if err != nil {
+			t.Error(err)
+		}
+		c <- count
+	}()
+
+	// create some occurrences
+	totalCreated := 3
+	for i:=0; i<totalCreated; i++ {
+		created, _ := sample.CreateOccurrence(v.imageUrl, v.noteId, v.projectId)
+		time.Sleep(time.Second)
+		sample.DeleteOccurrence(created.Name)
+		time.Sleep(time.Second)
+	}
+	result := <-c
+	assertEqual(t, result, totalCreated)
 
 	teardown(t, v)
 }

@@ -5,6 +5,7 @@ import (
 	"golang.org/x/net/context"
 	containeranalysis "cloud.google.com/go/devtools/containeranalysis/apiv1alpha1"
 	containeranalysispb "google.golang.org/genproto/googleapis/devtools/containeranalysis/v1alpha1"
+	pubsub "cloud.google.com/go/pubsub"
 )
 
 // [START create_note]
@@ -206,13 +207,24 @@ func Pubsub(subscriptionId string, timeout int, projectId string) (int, error){
 //Creates and returns a pubsub subscription listening to the occurrence topic.
 //This topic provides updates when occurrences are modified
 func CreateOccurrenceSubscription(subscriptionId, projectId string) (error){
-	return nil
+	ctx := context.Background()
+	client, err := pubsub.NewClient(ctx, projectId)
+	if err != nil {
+		return err
+	}
+
+
+	topicId := "resource-notes-occurrences-v1alpha1"
+	topic := client.Topic(topicId)
+	config := pubsub.SubscriptionConfig{Topic: topic}
+	_, err = client.CreateSubscription(ctx, subscriptionId, config)
+	return err
 }
 // [END pubsub]
 
 func main() {
 	fmt.Println("hello world")
-	_, err := CreateNote("test3", "sanche-testing-project")
+	err := CreateOccurrenceSubscription("drydockOccurrence3", "sanche-testing-project")
 	if err != nil {
 		fmt.Println(err)
 	}

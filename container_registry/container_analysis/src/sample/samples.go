@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"golang.org/x/net/context"
+	"time"
+	"sync"
 	containeranalysis "cloud.google.com/go/devtools/containeranalysis/apiv1alpha1"
 	containeranalysispb "google.golang.org/genproto/googleapis/devtools/containeranalysis/v1alpha1"
 	pubsub "cloud.google.com/go/pubsub"
@@ -201,7 +203,29 @@ func GetOccurrencesForImage(imageUrl, projectId string) (int, error){
 // [START pubsub]
 //Handle incoming occurrences using a pubsub subscription
 func Pubsub(subscriptionId string, timeout int, projectId string) (int, error){
-	return 0, nil
+	ctx := context.Background()
+	toctx, _ := context.WithTimeout(ctx, time.Duration(timeout) * time.Second)
+	var mu sync.Mutex
+	client, err := pubsub.NewClient(ctx, projectId)
+	if err != nil {
+		return -1, err
+	}
+	sub := client.Subscription(subscriptionId)
+	count := 0
+
+	// listen on the subscription until the context times out
+	err = sub.Receive(toctx, func(ctx context.Context, msg *pubsub.Message) {
+		mu.Lock()
+		defer mu.Unlock()
+		count = count + 1
+		fmt.Printf("Message %d: %q\n", count, string(msg.Data))
+		msg.Ack()
+	})
+	if err != nil {
+		return -1, err
+	}
+	fmt.Println(count)
+	return count, nil
 }
 
 //Creates and returns a pubsub subscription listening to the occurrence topic.

@@ -245,11 +245,3 @@ func CreateOccurrenceSubscription(subscriptionId, projectId string) (error){
 	return err
 }
 // [END pubsub]
-
-func main() {
-	fmt.Println("hello world")
-	err := CreateOccurrenceSubscription("drydockOccurrence3", "sanche-testing-project")
-	if err != nil {
-		fmt.Println(err)
-	}
-}

@@ -237,7 +237,7 @@ func TestPubSub(t *testing.T) {
 	sample.CreateOccurrenceSubscription(subId, v.projectId)
 
 	// run pubsub so any messages left in queue are acked
-	sample.Pubsub(subId, 5, v.projectId)
+	sample.Pubsub(subId, 20, v.projectId)
 
 	// use channel and goroutine to count incomming messages
 	c := make(chan int)

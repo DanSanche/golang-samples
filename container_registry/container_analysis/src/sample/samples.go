@@ -140,7 +140,7 @@ func GetOccurrence(occurrenceName string) (*containeranalysispb.Occurrence, erro
 //Prints the Discovery occurrence created for a specified image
 //This occurrence contains information about the initial scan on the image
 func GetDiscoveryInfo(imageUrl, projectId string) error {
-	filterStr := "kind=\"DISCOVERY\" AND resourceUrl=\"" + imageUrl + "\""
+	filterStr := `kind="DISCOVERY" AND resourceUrl="` + imageUrl + `"`
 	ctx := context.Background()
 	c, err := containeranalysis.NewClient(ctx)
 	if err != nil {
@@ -188,7 +188,7 @@ func GetOccurrencesForNote(noteId, projectId string) (int, error) {
 // [START occurrences_for_image]
 //Retrieves all the occurrences associated with a specified image
 func GetOccurrencesForImage(imageUrl, projectId string) (int, error) {
-	filterStr := "resourceUrl=\"" + imageUrl + "\""
+	filterStr := `resourceUrl="` + imageUrl + `"`
 	ctx := context.Background()
 	c, err := containeranalysis.NewClient(ctx)
 	if err != nil {

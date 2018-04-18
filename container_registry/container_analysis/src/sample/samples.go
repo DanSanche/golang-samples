@@ -9,6 +9,7 @@ import (
 	pubsub "cloud.google.com/go/pubsub"
 	"golang.org/x/net/context"
 	containeranalysispb "google.golang.org/genproto/googleapis/devtools/containeranalysis/v1alpha1"
+	"google.golang.org/api/iterator"
 )
 
 // [START create_note]
@@ -148,13 +149,20 @@ func GetDiscoveryInfo(imageUrl, projectId string) error {
 	}
 	project := containeranalysis.ProjectPath(projectId)
 	req := &containeranalysispb.ListOccurrencesRequest{Parent: project, Filter: filterStr}
-	iterator := c.ListOccurrences(ctx, req)
-	var complete error
+	it := c.ListOccurrences(ctx, req)
+	
 	var occ *containeranalysispb.Occurrence
-	for complete == nil {
-		occ, complete = iterator.Next()
+	for { 
+		occ, err = it.Next();
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return err
+		}
 		fmt.Println(occ)
 	}
+
 	return nil
 }
 
@@ -170,13 +178,19 @@ func GetOccurrencesForNote(noteId, projectId string) (int, error) {
 	}
 	noteName := containeranalysis.NotePath(projectId, noteId)
 	req := &containeranalysispb.ListNoteOccurrencesRequest{Name: noteName}
-	iterator := c.ListNoteOccurrences(ctx, req)
-	var complete error
-	count := -1
-	for complete == nil {
+	
+	it := c.ListNoteOccurrences(ctx, req)
+	count := 0
+	for {
+		_, err = it.Next();
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return -1, err
+		}
 		// we can do something with the retrieved occurence here
 		// for this sample, we will just count them
-		_, complete = iterator.Next()
 		count = count + 1
 	}
 
@@ -196,13 +210,19 @@ func GetOccurrencesForImage(imageUrl, projectId string) (int, error) {
 	}
 	project := containeranalysis.ProjectPath(projectId)
 	req := &containeranalysispb.ListOccurrencesRequest{Parent: project, Filter: filterStr}
-	iterator := c.ListOccurrences(ctx, req)
-	var complete error
-	count := -1
-	for complete == nil {
+	it := c.ListOccurrences(ctx, req)
+	count := 0
+	for {
+
+		_, err = it.Next();
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return -1, err
+		}	
 		// we can do something with the retrieved occurence here
 		// for this sample, we will just count them
-		_, complete = iterator.Next()
 		count = count + 1
 	}
 

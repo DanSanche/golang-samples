@@ -227,10 +227,10 @@ func Pubsub(subscriptionId string, timeout int, projectId string) (int, error) {
 	// listen on the subscription until the context times out
 	err = sub.Receive(toctx, func(ctx context.Context, msg *pubsub.Message) {
 		mu.Lock()
-		defer mu.Unlock()
 		count = count + 1
 		fmt.Printf("Message %d: %q\n", count, string(msg.Data))
 		msg.Ack()
+		mu.Unlock()
 	})
 	if err != nil {
 		return -1, err

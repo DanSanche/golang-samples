@@ -8,8 +8,8 @@ import (
 	containeranalysis "cloud.google.com/go/devtools/containeranalysis/apiv1alpha1"
 	pubsub "cloud.google.com/go/pubsub"
 	"golang.org/x/net/context"
-	containeranalysispb "google.golang.org/genproto/googleapis/devtools/containeranalysis/v1alpha1"
 	"google.golang.org/api/iterator"
+	containeranalysispb "google.golang.org/genproto/googleapis/devtools/containeranalysis/v1alpha1"
 )
 
 // [START create_note]
@@ -150,10 +150,10 @@ func GetDiscoveryInfo(imageUrl, projectId string) error {
 	project := containeranalysis.ProjectPath(projectId)
 	req := &containeranalysispb.ListOccurrencesRequest{Parent: project, Filter: filterStr}
 	it := c.ListOccurrences(ctx, req)
-	
+
 	var occ *containeranalysispb.Occurrence
-	for { 
-		occ, err = it.Next();
+	for {
+		occ, err = it.Next()
 		if err == iterator.Done {
 			break
 		}
@@ -178,11 +178,11 @@ func GetOccurrencesForNote(noteId, projectId string) (int, error) {
 	}
 	noteName := containeranalysis.NotePath(projectId, noteId)
 	req := &containeranalysispb.ListNoteOccurrencesRequest{Name: noteName}
-	
+
 	it := c.ListNoteOccurrences(ctx, req)
 	count := 0
 	for {
-		_, err = it.Next();
+		_, err = it.Next()
 		if err == iterator.Done {
 			break
 		}
@@ -214,13 +214,13 @@ func GetOccurrencesForImage(imageUrl, projectId string) (int, error) {
 	count := 0
 	for {
 
-		_, err = it.Next();
+		_, err = it.Next()
 		if err == iterator.Done {
 			break
 		}
 		if err != nil {
 			return -1, err
-		}	
+		}
 		// we can do something with the retrieved occurence here
 		// for this sample, we will just count them
 		count = count + 1
